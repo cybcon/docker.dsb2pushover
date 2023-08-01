@@ -10,7 +10,7 @@ COPY --chown=root:root /requirements.txt /
 
 RUN apk upgrade --available --no-cache --update \
     && apk add --no-cache --update \
-       libcurl=8.2.0-r1 \
+       libcurl=8.2.1-r1 \
        python3=3.11.4-r0 \
        py3-beautifulsoup4=4.12.2-r1 \
        py3-curl=7.45.2-r1 \
