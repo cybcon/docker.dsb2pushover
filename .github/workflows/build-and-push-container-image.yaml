@@ -1,0 +1,88 @@
+name: build-and-push-container-image
+on:
+  pull_request:
+    types:
+      - closed
+jobs:
+  build-and-push-container-image:
+    name: Build and push container image
+    runs-on: ubuntu-latest
+    if: |
+      github.event_name == 'pull_request' &&
+      github.event.pull_request.merged == true &&
+      github.event.action == 'closed' &&
+      (
+        contains(github.event.pull_request.labels.*.name, 'major') ||
+        contains(github.event.pull_request.labels.*.name, 'minor') ||
+        contains(github.event.pull_request.labels.*.name, 'patch')
+      ) &&
+      !contains(github.event.pull_request.labels.*.name, 'chore')
+    steps:
+      - name: Checkout GIT repository
+        uses: actions/checkout@v3
+
+      - name: install semver
+        uses: asdf-vm/actions/install@v2.2.0
+        with:
+          tool_versions: |
+            semver 3.3.0
+      - name: Determine release type
+        id: release_type
+        run: |
+          if [[ ${{ contains(github.event.pull_request.labels.*.name, 'major') }} == "true" ]]; then
+            echo "release_type=major" >> $GITHUB_OUTPUT
+          elif [[ ${{ contains(github.event.pull_request.labels.*.name, 'minor') }} == "true" ]]; then
+            echo "release_type=minor" >> $GITHUB_OUTPUT
+          elif [[ ${{ contains(github.event.pull_request.labels.*.name, 'patch') }} == "true" ]]; then
+            echo "release_type=patch" >> $GITHUB_OUTPUT
+          else
+            echo "### :x: Failed to determine release type from PR labels" >> $GITHUB_STEP_SUMMARY
+            exit 1
+          fi
+      - name: Determine next version
+        id: next_version
+        run: |
+          maybe_tag=$(git tag | sort -V | tail -1)
+          tag=${maybe_tag:-v0.0.0}
+          version=${tag:1}
+          echo "Current version is $version"
+
+          release_type=${{ steps.release_type.outputs.release_type }}
+          echo "Performing $release_type release!"
+
+          next_version=$(semver bump $release_type $version)
+          echo "Next version is $next_version"
+          echo "version=$next_version" >> $GITHUB_OUTPUT
+
+      # - name: Replace VERSION inside python script
+      #   run: |
+      #     SCRIPT='./app/modbus_server.py'
+      #     grep "^VERSION=" ${SCRIPT}
+      #     sed -i -e "s/^VERSION=.*$/VERSION='${{ steps.next_version.outputs.version }}'/" ${SCRIPT}
+      #     grep "^VERSION=" ${SCRIPT}
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Login to container registry
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+      - name: Build and push
+        uses: docker/build-push-action@v4
+        with:
+          push: true
+          context: .
+          platforms: linux/amd64, linux/arm64
+          tags: oitc/dsb2pushover:${{ steps.next_version.outputs.version }},oitc/dsb2pushover:latest
+          labels: |
+            site.local.program.version=${{ steps.next_version.outputs.version }}
+            context.github.repositoryUrl=${{ github.repositoryUrl }}
+            context.github.actor=${{ github.actor }}
+            context.github.event.repository.updated_at=${{ github.event.repository.updated_at}}
+            context.github.ref=${{ github.ref }}
+            context.github.job=${{ github.job }}
+            context.runner.os=${{ runner.os }}
+            context.runner.arch=${{ runner.arch }}
