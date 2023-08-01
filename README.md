@@ -7,7 +7,7 @@ Source code: [GitHub](https://github.com/cybcon/docker.dsb2pushover)
 # Supported tags and respective `Dockerfile` links
 
 
-* [`latest`, `v1.0.10`](https://github.com/cybcon/docker.dsb2pushover/blob/v1.0.10/Dockerfile)
+* [`latest`, `1.0.11`](https://github.com/cybcon/docker.dsb2pushover/blob/v1.0.11/Dockerfile)
 * [`1.0.9`](https://github.com/cybcon/docker.dsb2pushover/blob/v1.0.9/Dockerfile)
 
 # What is the dsb2pushover container?
