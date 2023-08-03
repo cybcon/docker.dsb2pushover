@@ -1,8 +1,8 @@
 name: build-and-push-container-image
 on:
-  push:
-    tags:
-     - '*'
+  release:
+    types:
+      - published
 
 jobs:
   build-and-push-container-image:
