@@ -1,37 +1,35 @@
 name: build-and-push-container-image
 on:
-  workflow_dispatch:
-  release:
+  pull_request:
     types:
-      - published
+      - closed
 
 jobs:
   build-and-push-container-image:
     name: Build and push container image
     runs-on: ubuntu-latest
+    if: |
+      github.event_name == 'pull_request' &&
+      github.event.pull_request.merged == true &&
+      github.event.action == 'closed' &&
+      (
+        contains(github.event.pull_request.labels.*.name, 'major') ||
+        contains(github.event.pull_request.labels.*.name, 'minor') ||
+        contains(github.event.pull_request.labels.*.name, 'patch')
+      ) &&
+      !contains(github.event.pull_request.labels.*.name, 'chore')
     steps:
-      - name: Determine last tag version
-        id: next_version
-        run: |
-          maybe_tag=$(git tag | sort -V | tail -1)
-          tag=${maybe_tag:-v0.0.0}
-          version=${tag:1}
-          echo "Current version is $version"
-
-          echo "version=$version" >> $GITHUB_OUTPUT
-
       - name: Checkout GIT repository
         uses: actions/checkout@v3
-        with:
-          ref: v${{ steps.next_version.outputs.version }}
-
-      - name: Replace VERSION inside python script
+      - name: Get the application version
+        id: application-version
         run: |
-          SCRIPT='./src/app/dsb2pushover.py'
-          grep "^VERSION=" ${SCRIPT}
-          sed -i -e "s/^VERSION=.*$/VERSION='${{ steps.next_version.outputs.version }}'/" ${SCRIPT}
-          grep "^VERSION=" ${SCRIPT}
-
+          image_version=$(grep "^LABEL site.local.program.version=" Dockerfile | cut -d= -f2 | sed -e 's/"//g')
+          if [ -z "${image_version}" ]; then
+            echo "ERROR: unable to detect version number!" >&2
+            exit 1
+          fi
+          echo "tag=${image_version}" >> $GITHUB_OUTPUT
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
       - name: Set up Docker Buildx
@@ -47,9 +45,9 @@ jobs:
           push: true
           context: .
           platforms: linux/amd64, linux/arm64
-          tags: oitc/dsb2pushover:${{ steps.next_version.outputs.version }},oitc/dsb2pushover:latest
+          tags: oitc/dsb2pushover:${{ steps.application-version.outputs.tag }},oitc/dsb2pushover:latest
           labels: |
-            site.local.program.version=${{ steps.next_version.outputs.version }}
+            site.local.program.version=${{ steps.application-version.outputs.tag }}
             context.github.repositoryUrl=${{ github.repositoryUrl }}
             context.github.actor=${{ github.actor }}
             context.github.event.repository.updated_at=${{ github.event.repository.updated_at}}
