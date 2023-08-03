@@ -1,6 +1,5 @@
 name: build-and-push-container-image
 on:
-  workflow_dispatch:
   release:
     types:
       - published
