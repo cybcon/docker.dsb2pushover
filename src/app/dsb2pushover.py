@@ -14,7 +14,7 @@ import dsbapi
 import logging
 from packaging import version
 
-VERSION='1.0.10'
+VERSION='1.0.12'
 
 dsbapi_min_version = '0.0.14'
 if version.parse(dsbapi.__version__) < version.parse(dsbapi_min_version):
