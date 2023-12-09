@@ -1,4 +1,4 @@
-datetime==5.2
+datetime==5.3
 # needs to be fixed to 0.0.14 and \src\usr\local\lib\python3.9\site-packages\dsbapi\__init__.py needs to be removed
 dsbapipy>=0.0.13
 http.client==0.1.22

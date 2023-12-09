@@ -9,10 +9,9 @@ Container image: [DockerHub](https://hub.docker.com/r/oitc/dsb2pushover)
 # Supported tags and respective `Dockerfile` links
 
 
-* [`latest`, `1.0.12`](https://github.com/cybcon/docker.dsb2pushover/blob/v1.0.12/Dockerfile)
+* [`latest`, `1.0.13`](https://github.com/cybcon/docker.dsb2pushover/blob/v1.0.13/Dockerfile)
+* [`1.0.12`](https://github.com/cybcon/docker.dsb2pushover/blob/v1.0.12/Dockerfile)
 * [`1.0.9`](https://github.com/cybcon/docker.dsb2pushover/blob/v1.0.9/Dockerfile)
-* [`1.0.8`](https://dev.azure.com/oberdorf-itc/Infrastructure/_git/docker.dsb2pushover?path=%2Fresources%2FDockerfile&version=GT1.0.8&_a=contents)
-* [`1.0.7`](https://dev.azure.com/oberdorf-itc/Infrastructure/_git/docker.dsb2pushover?path=%2Fresources%2FDockerfile&version=GT1.0.7&_a=contents)
 
 
 # What is the dsb2pushover container?
