@@ -20,7 +20,7 @@ RUN apk upgrade --available --no-cache --update \
        py3-pillow=10.1.0-r1 \
        py3-pip=23.3.1-r0 \
        py3-requests=2.31.0-r1 \
-    && pip3 install --no-cache-dir -r /requirements.txt
+    && pip3 install --no-cache-dir --break-system-packages -r /requirements.txt
 
 COPY --chown=root:root /src /
 
