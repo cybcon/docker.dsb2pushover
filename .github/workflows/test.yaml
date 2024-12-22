@@ -24,7 +24,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install ruff pytest
           pip install -r requirements.txt
-          pip install beautifulsoup4 curl numpy packaging pandas pillow requests
+          pip install beautifulsoup4 numpy packaging pandas pillow requests
       - name: Lint with ruff
         run: |
           # stop the build if there are Python syntax errors or undefined names
