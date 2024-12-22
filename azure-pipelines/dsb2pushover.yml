@@ -27,7 +27,7 @@ pool:
   vmImage: ubuntu-latest
 
 variables:
-  appVersion: 1.0.12
+  appVersion: 1.0.14
   REGISTRY: Docker Hub (OITC)
   REPOSITORY_NAME: oitc/dsb2pushover
   containerBuildPath: $(Build.Repository.Name)/resources
