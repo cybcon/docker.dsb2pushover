@@ -25,6 +25,7 @@ jobs:
           pip install ruff pytest
           pip install -r requirements.txt
           pip install beautifulsoup4 numpy packaging pandas pillow requests
+          cp ./src/usr/lib/python3.12/site-packages/dsbapi/__init__.py /usr/lib/python${{ matrix.python-version }}/site-packages/dsbapi/__init__.py
       - name: Lint with ruff
         run: |
           # stop the build if there are Python syntax errors or undefined names
